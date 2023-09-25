@@ -1,0 +1,21 @@
+{
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.119",
+    "@types/bcrypt": "^5.0.0",
+    "@types/bcryptjs": "^2.4.4",
+    "@types/jsonwebtoken": "^9.0.3",
+    "serverless-webpack": "^5.13.0",
+    "ts-loader": "^9.4.4",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "@middy/core": "^4.6.4",
+    "@middy/http-json-body-parser": "^4.6.4",
+    "aws-sdk": "^2.1451.0",
+    "bcryptjs": "^2.4.3",
+    "dayjs": "^1.11.9",
+    "jsonwebtoken": "^9.0.2",
+    "nanoid": "^4.0.2",
+    "zod": "^3.22.2"
+  }
+}

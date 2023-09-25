@@ -1,0 +1,107 @@
+service: quiztopia
+frameworkVersion: '3'
+
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: eu-north-1
+  httpApi:
+    cors: true
+  iam:
+    role: arn:aws:iam::964128208950:role/school
+  deploymentMethod: direct
+  environment:
+    TABLE_NAME: quiztopia
+    USERNAME_INDEX: usernames
+    QUIZ_INDEX: quizes
+    JWT_SECRET: ${env:JWT_SECRET}
+
+plugins:
+  - serverless-webpack
+
+package:
+  individually: true
+
+functions:
+  loginUser:
+    handler: src/functions/user/loginUser.handler
+    events:
+      - httpApi:
+          path: /api/user/login
+          method: POST
+  registerUser:
+    handler: src/functions/user/registerUser.handler
+    events:
+      - httpApi:
+          path: /api/user/register
+          method: POST
+  getAllQuizes:
+    handler: src/functions/quiz/getAllQuizes.handler
+    events:
+      - httpApi:
+          path: /api/quiz
+          method: GET
+  getQuiz:
+    handler: src/functions/quiz/getQuiz.handler
+    events:
+      - httpApi:
+          path: /api/quiz/{quizId}
+          method: GET
+  createQuiz:
+    handler: src/functions/quiz/createQuiz.handler
+    events:
+      - httpApi:
+          path: /api/quiz
+          method: POST
+  deleteQuiz:
+    handler: src/functions/quiz/deleteQuiz.handler
+    events:
+      - httpApi:
+          path: /api/quiz/{quizId}
+          method: DELETE
+
+  addQuestion:
+    handler: src/functions/quiz/addQuestion.handler
+    events:
+      - httpApi:
+          path: /api/quiz/{quizId}/question
+          method: POST
+
+resources:
+  Resources:
+    Quiztopia:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.TABLE_NAME}
+        AttributeDefinitions:
+          - AttributeName: PK
+            AttributeType: S
+          - AttributeName: SK
+            AttributeType: S
+          - AttributeName: username
+            AttributeType: S
+          - AttributeName: quizId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: PK
+            KeyType: HASH
+          - AttributeName: SK
+            KeyType: RANGE
+        GlobalSecondaryIndexes:
+          - IndexName: ${self:provider.environment.QUIZ_INDEX}
+            KeySchema:
+              - AttributeName: quizId
+                KeyType: HASH
+              - AttributeName: SK
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+          - IndexName: ${self:provider.environment.USERNAME_INDEX}
+            KeySchema:
+              - AttributeName: username
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+        BillingMode: PAY_PER_REQUEST
