@@ -4,6 +4,7 @@ import middy from '@middy/core';
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 
 import { ApiFail } from '../errors/api.error.ts';
+import { statusCodes } from '../types/statusCodes.type.ts';
 
 function formatZodError(error: z.ZodError) {
   return error.errors.map((e) => ({ [e.path.at(0) as string]: e.message }));
@@ -18,7 +19,9 @@ export function validate(
         await validation.parseAsync(request.event.body);
       } catch (error) {
         if (error instanceof z.ZodError) {
-          throw new ApiFail(400, { data: formatZodError(error) });
+          throw new ApiFail(statusCodes.badRequest, {
+            data: formatZodError(error),
+          });
         }
       }
     },

@@ -1,10 +1,9 @@
 import { nanoid } from 'nanoid';
 
 import { database } from './database.service.ts';
-
 import { ApiError } from '../errors/api.error.ts';
-
 import { quizService, usersService } from './mod.ts';
+import { statusCodes } from '../types/statusCodes.type.ts';
 
 interface ScoreItem {
   PK: string;
@@ -37,7 +36,7 @@ export async function submitScore(
       })
       .promise();
   } else {
-    throw new ApiError(400, {
+    throw new ApiError(statusCodes.badRequest, {
       message: `Score can not exceed the maximum number of questions: '${maxScore}'`,
     });
   }

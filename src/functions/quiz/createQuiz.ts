@@ -6,7 +6,6 @@ import { z } from 'zod';
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 
 import { createResponse } from '../../utils/response.util.ts';
-
 import { quizService } from '../../services/mod.ts';
 
 import {
@@ -16,6 +15,7 @@ import {
 } from '../../middlewares/mod.ts';
 
 import { quizValidation } from '../../validations/mod.ts';
+import { statusCodes } from '../../types/statusCodes.type.ts';
 
 async function lambda(
   event: APIGatewayProxyEvent
@@ -26,7 +26,7 @@ async function lambda(
 
   const id = await quizService.createQuiz(event.auth.userId, quiz.name);
 
-  return createResponse(201, {
+  return createResponse(statusCodes.created, {
     status: 'success',
     data: { id },
   });

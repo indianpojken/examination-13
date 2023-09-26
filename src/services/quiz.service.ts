@@ -7,6 +7,8 @@ import { usersService } from './mod.ts';
 
 import type { Question } from '../types/quiz.type.ts';
 
+import { statusCodes } from '../types/statusCodes.type.ts';
+
 interface QuizItem {
   SK: string;
   PK: string;
@@ -50,7 +52,7 @@ export async function getQuizById(quizId: string) {
       questions,
     } as QuizItem;
   } else {
-    throw new ApiError(404, {
+    throw new ApiError(statusCodes.notFound, {
       message: `No quiz with the id: '${quizId}' was found`,
     });
   }
@@ -102,7 +104,7 @@ export async function addQuestionToQuiz(
       })
       .promise();
   } else {
-    throw new ApiError(403, {
+    throw new ApiError(statusCodes.forbidden, {
       message: `User with the id: '${userId}' don't have permission to add a question to quiz with the id: '${quizId}'`,
     });
   }
@@ -158,7 +160,7 @@ export async function deleteQuizById(userId: string, quizId: string) {
 
     return quiz as QuizItem;
   } else {
-    throw new ApiError(403, {
+    throw new ApiError(statusCodes.forbidden, {
       message: `User with the id: '${userId}' don't have permission to remove quiz with the id: '${quizId}'`,
     });
   }

@@ -6,7 +6,6 @@ import { z } from 'zod';
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 
 import { createResponse } from '../../utils/response.util.ts';
-
 import { usersService } from '../../services/mod.ts';
 
 import {
@@ -15,6 +14,7 @@ import {
 } from '../../middlewares/mod.ts';
 
 import { usersValidation } from '../../validations/mod.ts';
+import { statusCodes } from '../../types/statusCodes.type.ts';
 
 async function lambda(
   event: APIGatewayProxyEvent
@@ -25,7 +25,7 @@ async function lambda(
 
   const token = await usersService.loginUser(username, password);
 
-  return createResponse(200, {
+  return createResponse(statusCodes.ok, {
     status: 'success',
     data: { token },
   });

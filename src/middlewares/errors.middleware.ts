@@ -4,6 +4,7 @@ import type { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 
 import { ApiFail, ApiError } from '../errors/api.error.ts';
 import { createResponse } from '../utils/response.util.ts';
+import { statusCodes } from '../types/statusCodes.type.ts';
 
 export function errorHandler(): middy.MiddlewareObj<
   APIGatewayProxyEvent,
@@ -25,12 +26,12 @@ export function errorHandler(): middy.MiddlewareObj<
           ...(error.data && { data: error.data }),
         });
       } else if (error instanceof Error) {
-        request.response = createResponse(400, {
+        request.response = createResponse(statusCodes.badRequest, {
           status: 'error',
           message: error.message,
         });
       } else {
-        request.response = createResponse(500, {
+        request.response = createResponse(statusCodes.internalServerError, {
           status: 'error',
           message: 'Internal Server Error',
         });

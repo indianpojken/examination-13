@@ -4,6 +4,7 @@ import { nanoid } from 'nanoid';
 
 import { database } from './database.service.ts';
 import { ApiError } from '../errors/api.error.ts';
+import { statusCodes } from '../types/statusCodes.type.ts';
 
 interface UserItem {
   PK: string;
@@ -26,7 +27,7 @@ export async function getUserById(id: string) {
   if (user) {
     return user as UserItem;
   } else {
-    throw new ApiError(404, {
+    throw new ApiError(statusCodes.notFound, {
       message: `No user with the id: '${id}' was found`,
     });
   }
@@ -64,7 +65,7 @@ export async function registerUser(username: string, password: string) {
       })
       .promise();
   } else {
-    throw new ApiError(409, {
+    throw new ApiError(statusCodes.conflict, {
       message: `Username: '${username}' is already in use`,
     });
   }
@@ -83,10 +84,12 @@ export async function loginUser(username: string, password: string) {
 
       return token;
     } else {
-      throw new ApiError(401, { message: 'Incorrect password' });
+      throw new ApiError(statusCodes.unauthorized, {
+        message: 'Incorrect password',
+      });
     }
   } else {
-    throw new ApiError(404, {
+    throw new ApiError(statusCodes.notFound, {
       message: `No user with the username: '${username}' was found`,
     });
   }

@@ -1,12 +1,10 @@
 import middy from '@middy/core';
 import jsonBodyParser from '@middy/http-json-body-parser';
-
 import { z } from 'zod';
 
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 
 import { createResponse } from '../../utils/response.util.ts';
-
 import { quizService } from '../../services/mod.ts';
 
 import {
@@ -16,6 +14,7 @@ import {
 } from '../../middlewares/mod.ts';
 
 import { quizValidation } from '../../validations/mod.ts';
+import { statusCodes } from '../../types/statusCodes.type.ts';
 
 async function lambda(
   event: APIGatewayProxyEvent
@@ -30,7 +29,7 @@ async function lambda(
     question
   );
 
-  return createResponse(201, {
+  return createResponse(statusCodes.created, {
     status: 'success',
     data: null,
   });
