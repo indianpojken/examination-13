@@ -61,13 +61,24 @@ functions:
       - httpApi:
           path: /api/quiz/{quizId}
           method: DELETE
-
   addQuestion:
     handler: src/functions/quiz/addQuestion.handler
     events:
       - httpApi:
           path: /api/quiz/{quizId}/question
           method: POST
+  submitScore:
+    handler: src/functions/leaderboard/submitScore.handler
+    events:
+      - httpApi:
+          path: /api/leaderboard/{quizId}
+          method: POST
+  getAllScores:
+    handler: src/functions/leaderboard/getAllScores.handler
+    events:
+      - httpApi:
+          path: /api/leaderboard
+          method: GET
 
 resources:
   Resources:

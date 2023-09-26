@@ -5,6 +5,13 @@ import { nanoid } from 'nanoid';
 import { database } from './database.service.ts';
 import { ApiError } from '../errors/api.error.ts';
 
+interface UserItem {
+  PK: string;
+  SK: string;
+  username: string;
+  password: string;
+}
+
 export async function getUserById(id: string) {
   const { Item: user } = await database
     .get({
@@ -17,7 +24,7 @@ export async function getUserById(id: string) {
     .promise();
 
   if (user) {
-    return user;
+    return user as UserItem;
   } else {
     throw new ApiError(404, {
       message: `No user with the id: '${id}' was found`,
@@ -38,7 +45,7 @@ export async function getUserByUsername(username: string) {
 
   const user = users?.at(0);
 
-  return user;
+  return user as UserItem;
 }
 
 export async function registerUser(username: string, password: string) {

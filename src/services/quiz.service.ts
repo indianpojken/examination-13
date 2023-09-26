@@ -7,7 +7,7 @@ import { usersService } from './mod.ts';
 
 import type { Question } from '../types/quiz.type.ts';
 
-interface Quiz {
+interface QuizItem {
   SK: string;
   PK: string;
   quizId: string;
@@ -48,7 +48,7 @@ export async function getQuizById(quizId: string) {
     return {
       ...quiz,
       questions,
-    } as Quiz;
+    } as QuizItem;
   } else {
     throw new ApiError(404, {
       message: `No quiz with the id: '${quizId}' was found`,
@@ -120,24 +120,43 @@ export async function getAllQuizes() {
     })
     .promise();
 
-  return quizes as Quiz[];
+  return quizes as QuizItem[];
 }
 
 export async function deleteQuizById(userId: string, quizId: string) {
   const quiz = await getQuizById(quizId);
 
   if (await isQuizAuthor(userId, quizId)) {
-    await database
-      .delete({
+    const { Items: entries } = await database
+      .scan({
         TableName: process.env.TABLE_NAME as string,
-        Key: {
-          PK: quiz.PK,
-          SK: quiz.SK,
+        IndexName: process.env.QUIZ_INDEX as string,
+        FilterExpression: 'quizId = :quizId',
+        ExpressionAttributeValues: {
+          ':quizId': `quiz#${quizId}`,
         },
       })
       .promise();
 
-    return quiz as Quiz;
+    if (entries?.length) {
+      const itemsToDelete = entries.map((entry) => ({
+        Key: {
+          PK: entry.PK,
+          SK: entry.SK,
+        },
+      }));
+
+      for (const item of itemsToDelete) {
+        await database
+          .delete({
+            TableName: process.env.TABLE_NAME as string,
+            ...item,
+          })
+          .promise();
+      }
+    }
+
+    return quiz as QuizItem;
   } else {
     throw new ApiError(403, {
       message: `User with the id: '${userId}' don't have permission to remove quiz with the id: '${quizId}'`,
@@ -145,7 +164,7 @@ export async function deleteQuizById(userId: string, quizId: string) {
   }
 }
 
-export function createQuizResponse(quiz: Quiz) {
+export function createQuizResponse(quiz: QuizItem) {
   return {
     id: quiz.SK.replace('quiz#', ''),
     name: quiz.name,
