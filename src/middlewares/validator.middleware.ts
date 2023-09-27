@@ -7,7 +7,9 @@ import { ApiFail } from '../errors/api.error.ts';
 import { statusCodes } from '../types/statusCodes.type.ts';
 
 function formatZodError(error: z.ZodError) {
-  return error.errors.map((e) => ({ [e.path.at(0) as string]: e.message }));
+  return error.errors.map((e) => ({
+    [e.path.at(e.path.length - 1) as string]: e.message,
+  }));
 }
 
 export function validate(
